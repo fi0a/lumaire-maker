@@ -215,59 +215,65 @@ const decompress = (compressed) => {
 const init = () => {
     const url = new URL(window.location);
     const compressed = url.searchParams.get('c');
-    let data = decompress(compressed);
+    if (compressed) {
+        let data = null
+        try {
+            data = decompress(compressed);
+            if (data) {
+                sukumizu.hue(data.sukumizu.h);
+                sukumizu.saturate(data.sukumizu.s);
+                sukumizu.brightness(data.sukumizu.b);
 
-    if (data) {
-        sukumizu.hue(data.sukumizu.h);
-        sukumizu.saturate(data.sukumizu.s);
-        sukumizu.brightness(data.sukumizu.b);
+                eyes.hue(data.eyes.h);
+                eyes.saturate(data.eyes.s);
+                eyes.brightness(data.eyes.b);
 
-        eyes.hue(data.eyes.h);
-        eyes.saturate(data.eyes.s);
-        eyes.brightness(data.eyes.b);
+                harnessDevice.hue(data.harnessDevice.h);
+                harnessDevice.saturate(data.harnessDevice.s);
+                harnessDevice.brightness(data.harnessDevice.b);
 
-        harnessDevice.hue(data.harnessDevice.h);
-        harnessDevice.saturate(data.harnessDevice.s);
-        harnessDevice.brightness(data.harnessDevice.b);
+                harnessBelt.hue(data.harnessBelt.h);
+                harnessBelt.saturate(data.harnessBelt.s);
+                harnessBelt.brightness(data.harnessBelt.b);
 
-        harnessBelt.hue(data.harnessBelt.h);
-        harnessBelt.saturate(data.harnessBelt.s);
-        harnessBelt.brightness(data.harnessBelt.b);
+                hair.hue(data.hair.h);
+                hair.saturate(data.hair.s);
+                hair.brightness(data.hair.b);
 
-        hair.hue(data.hair.h);
-        hair.saturate(data.hair.s);
-        hair.brightness(data.hair.b);
+                if (data.eyesEnabled) {
+                    document.getElementById('eyes-enabled').checked = true;
+                    document.getElementById('eyes').style.display = 'block';
+                } else {
+                    document.getElementById('eyes-enabled').checked = false;
+                    document.getElementById('eyes').style.display = 'none';
+                }
 
-        if (data.eyesEnabled) {
-            document.getElementById('eyes-enabled').checked = true;
-            document.getElementById('eyes').style.display = 'block';
-        } else {
-            document.getElementById('eyes-enabled').checked = false;
-            document.getElementById('eyes').style.display = 'none';
-        }
+                if (data.eyesG) {
+                    document.getElementById('eyes-g').checked = true;
+                    document.getElementById('eyes6').style.display = 'block';
+                } else {
+                    document.getElementById('eyes-g').checked = false;
+                    document.getElementById('eyes6').style.display = 'none';
+                }
 
-        if (data.eyesG) {
-            document.getElementById('eyes-g').checked = true;
-            document.getElementById('eyes6').style.display = 'block';
-        } else {
-            document.getElementById('eyes-g').checked = false;
-            document.getElementById('eyes6').style.display = 'none';
-        }
+                if (data.harnessEnabled) {
+                    document.getElementById('harness-enabled').checked = true;
+                    document.getElementById('harness-belt-enabled').checked = true;
+                    document.getElementById('harness').style.display = 'block';
+                } else {
+                    document.getElementById('harness-enabled').checked = false;
+                    document.getElementById('harness-belt-enabled').checked = false;
+                    document.getElementById('harness').style.display = 'none';
+                }
 
-        if (data.harnessEnabled) {
-            document.getElementById('harness-enabled').checked = true;
-            document.getElementById('harness-belt-enabled').checked = true;
-            document.getElementById('harness').style.display = 'block';
-        } else {
-            document.getElementById('harness-enabled').checked = false;
-            document.getElementById('harness-belt-enabled').checked = false;
-            document.getElementById('harness').style.display = 'none';
-        }
-
-        if (data.biribiri) {
-            document.getElementById('biribiri').style.display = 'block';
-        } else if (data.gun) {
-            document.getElementById('gun').style.display = 'block';
+                if (data.biribiri) {
+                    document.getElementById('biribiri').style.display = 'block';
+                } else if (data.gun) {
+                    document.getElementById('gun').style.display = 'block';
+                }
+            }
+        } catch (e) {
+            console.error(e);
         }
     }
 
