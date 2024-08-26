@@ -30,6 +30,9 @@ class HSBVControl {
         this.s = `saturate(100%)`;
         this.b = `brightness(100%)`;
         this.targets = targets;
+        this.hc = hc;
+        this.sc = sc;
+        this.bc = bc;
 
         hc.value = 0;
         hc.addEventListener('input', (e) => {
@@ -57,6 +60,19 @@ class HSBVControl {
 
         this.parent.draw()
     }
+
+    randomize() {
+        const h = Math.floor(Math.random() * 360);
+        this.h = `hue-rotate(${h}deg)`;
+        const s = Math.floor(Math.random() * 100);
+        this.s = `saturate(${s}%)`;
+        const b = Math.floor(Math.random() * 100);
+        this.b = `brightness(${b}%)`;
+        this.update();
+        this.hc.value = h;
+        this.sc.value = s;
+        this.bc.value = b;
+    }
 }
 
 class CanvasApp {
@@ -66,16 +82,30 @@ class CanvasApp {
 
         this.initLayers();
         this.loadImages().then(() => {
-            this.draw();
+            this.randomize();
         });
 
         this.eyesVisible = true;
+        this.tearsVisible = true;
         this.harnessVisible = true;
         this.biribiriVisible = false;
         this.gunVisible = false;
 
+        document.getElementById('randomize').addEventListener('click', () => {
+            this.randomize();
+        });
+
+        document.getElementById('download').addEventListener('click', () => {
+            this.download();
+        });
+
         document.getElementById('eyes-enabled').addEventListener('input', (e) => {
             this.eyesVisible = e.target.checked;
+            this.draw();
+        })
+
+        document.getElementById('eyes-g').addEventListener('input', (e) => {
+            this.tearsVisible = e.target.checked;
             this.draw();
         })
 
@@ -91,14 +121,14 @@ class CanvasApp {
         })
 
         document.getElementById('enable-biri').addEventListener('click', (e) => {
-            this.biribiriVisible = e.target.checked;
-            this.gunVisible = !e.target.checked;
+            this.biribiriVisible = true;
+            this.gunVisible = false;
             this.draw();
         })
 
         document.getElementById('enable-gun').addEventListener('click', (e) => {
-            this.gunVisible = e.target.checked;
-            this.biribiriVisible = !e.target.checked;
+            this.gunVisible = true;
+            this.biribiriVisible = false;
             this.draw();
         })
 
@@ -115,7 +145,7 @@ class CanvasApp {
         const sukumizuBaseHi = new ImageLayer('img/sukumizu/base-hi2-dodge.webp', 'color-dodge');
         sukumizuBaseHi.applyFilter(`hue-rotate(0deg) saturate(100%) brightness(100%)`);
 
-        new HSBVControl(
+        this.sukumizuControl = new HSBVControl(
             this,
             document.getElementById('sukumizu-h'),
             document.getElementById('sukumizu-s'),
@@ -135,7 +165,7 @@ class CanvasApp {
             new ImageLayer('img/eyes/6.webp', 'source-over'),
         ]
 
-        new HSBVControl(
+        this.eyesControl = new HSBVControl(
             this,
             document.getElementById('eyes-h'),
             document.getElementById('eyes-s'),
@@ -145,7 +175,7 @@ class CanvasApp {
 
         const harnessDevice = new ImageLayer('img/harness/3.webp', 'source-over');
 
-        new HSBVControl(
+        this.harnessControl = new HSBVControl(
             this,
             document.getElementById('harness-device-h'),
             document.getElementById('harness-device-s'),
@@ -154,7 +184,7 @@ class CanvasApp {
         );
 
         const harnessBelt = new ImageLayer('img/harness/0.webp', 'source-over');
-        new HSBVControl(
+        this.harnessBeltControl = new HSBVControl(
             this,
             document.getElementById('harness-belt-h'),
             document.getElementById('harness-belt-s'),
@@ -163,7 +193,7 @@ class CanvasApp {
         )
 
         const hair = new ImageLayer('img/hair/hair0.webp', 'source-over');
-        new HSBVControl(
+        this.hairControl = new HSBVControl(
             this,
             document.getElementById('hair-h'),
             document.getElementById('hair-s'),
@@ -205,6 +235,7 @@ class CanvasApp {
                 new ImageLayer('img/biribiri/1.webp', 'hard-light')
             ],
             gun: new ImageLayer('img/gun/0.webp', 'source-over'),
+            sign: new ImageLayer('img/sign.webp', 'source-over', true),
         };
     }
 
@@ -241,7 +272,12 @@ class CanvasApp {
             this.layers.harness.forEach(layer => layer.draw(this.ctx));
         }
         if (this.eyesVisible) {
-            this.layers.eyes.forEach(layer => layer.draw(this.ctx));
+            this.layers.eyes.forEach((layer, index, layers) => {
+                if (layers.length - 1 === index && !this.tearsVisible) {
+                    return;
+                }
+                layer.draw(this.ctx)
+            });
         }
         if (this.biribiriVisible) {
             this.layers.biribiri.forEach(layer => layer.draw(this.ctx));
@@ -249,6 +285,33 @@ class CanvasApp {
         if (this.gunVisible) {
             this.layers.gun.draw(this.ctx);
         }
+        this.layers.sign.draw(this.ctx);
+    }
+
+    randomize() {
+        this.sukumizuControl.randomize();
+        this.eyesControl.randomize();
+        this.harnessControl.randomize();
+        this.harnessBeltControl.randomize();
+        this.hairControl.randomize();
+    }
+
+    download() {
+        const [width, height] = [this.canvas.width, this.canvas.height];
+
+        // 大きいサイズに変更
+        this.canvas.width = width * 2;
+        this.canvas.height = height * 2;
+        this.draw();
+        const link = document.createElement('a');
+        link.download = 'lumaire.png';
+        link.href = this.canvas.toDataURL();
+        link.click();
+
+        // サイズを元に戻す
+        this.canvas.width = width;
+        this.canvas.height = height;
+        this.draw();
     }
 }
 
