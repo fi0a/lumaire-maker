@@ -1,0 +1,128 @@
+<head>
+    <meta charset="UTF-8">
+    <title>Captured Lumaire Maker</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" type="module"></script>
+</head>
+<div>
+    <div id="controller">
+        <div id="controller-colors">
+            <div>
+                <input type="checkbox" id="hair-enabled" checked disabled>
+                <label for="hair-enabled">💈</label>
+                <label for="hair-h">H</label>
+                <input type="range" id="hair-h" min="0" max="360" value="0">
+                <label for="hair-s">S</label>
+                <input type="range" id="hair-s" min="0" max="200" value="100">
+                <label for="hair-b">B</label>
+                <input type="range" id="hair-b" min="0" max="300" value="50">
+            </div>
+            <div>
+                <input type="checkbox" id="eyes-enabled" checked>
+                <label for="eyes-enabled">👀</label>
+                <label for="eyes-h">H</label>
+                <input type="range" id="eyes-h" min="0" max="360" value="0">
+                <label for="eyes-s">S</label>
+                <input type="range" id="eyes-s" min="0" max="200" value="100">
+                <label for="eyes-b">B</label>
+                <input type="range" id="eyes-b" min="0" max="300" value="50">
+                <input type="checkbox" id="eyes-g" checked>
+                <label for="eyes-g">😿</label>
+            </div>
+            <div>
+                <input type="checkbox" id="sukumizu-enabled" checked disabled>
+                <label for="sukumizu-enabled">🩱</label>
+                <label for="sukumizu-h">H</label>
+                <input type="range" id="sukumizu-h" min="0" max="360" value="0">
+                <label for="sukumizu-s">S</label>
+                <input type="range" id="sukumizu-s" min="0" max="200" value="100">
+                <label for="sukumizu-b">B</label>
+                <input type="range" id="sukumizu-b" min="0" max="300" value="50">
+                <input type="checkbox" id="sukumizu-g">
+                <label for="sukumizu-g">🎮🌈</label>
+            </div>
+            <div>
+                <input type="checkbox" id="harness-enabled" checked>
+                <label for="harness-enabled">🔐</label>
+                <label for="harness-device-h">H</label>
+                <input type="range" id="harness-device-h" min="0" max="360" value="0">
+                <label for="harness-device-s">S</label>
+                <input type="range" id="harness-device-s" min="0" max="200" value="100">
+                <label for="harness-device-b">B</label>
+                <input type="range" id="harness-device-b" min="0" max="300" value="50">
+            </div>
+            <div>
+                <input type="checkbox" id="harness-belt-enabled" checked disabled>
+                <label for="harness-belt-enabled">⛓️</label>
+                <label for="harness-belt-h">H</label>
+                <input type="range" id="harness-belt-h" min="0" max="360" value="0">
+                <label for="harness-belt-s">S</label>
+                <input type="range" id="harness-belt-s" min="0" max="200" value="100">
+                <label for="harness-belt-b">B</label>
+                <input type="range" id="harness-belt-b" min="0" max="300" value="50">
+            </div>
+        </div>
+        <div>
+            <button id="enable-biri">⚡️</button>
+            <button id="enable-gun">🔫</button>
+            <button id="none">❌</button>
+        </div>
+    </div>
+</div>
+<div id="canvas">
+    <img src="img/background.webp" alt="background" class="background">
+    <img src="img/character-base.webp" alt="character" class="character">
+    <div>
+        <img src="img/sukumizu/base.webp" alt="sukumizu" class="sukumizu" id="sukumizu">
+        <img src="img/sukumizu/nakame.webp" alt="nakame" class="nakame">
+        <img src="img/sukumizu/base-hi-dodge.webp" alt="base-hi-dodge" class="base-hi-dodge">
+        <img src="img/sukumizu/base-shadow-multiply.webp" alt="base-shadow-multiply" id="base-shadow-multiply">
+        <img src="img/sukumizu/line.webp" alt="line" class="line">
+        <img src="img/sukumizu/base-hi2-dodge.webp" alt="base-hi2-dodge" id="base-hi2-dodge">
+        <img src="img/sukumizu/tags.webp" alt="tags" class="tags">
+    </div>
+    <div id="eyes">
+        <img src="img/eyes/0.webp" alt="eyes" id="eyes0">
+        <img src="img/eyes/1.webp" alt="eyes" id="eyes1">
+        <img src="img/eyes/2.webp" alt="eyes" id="eyes2">
+        <img src="img/eyes/3.webp" alt="eyes" id="eyes3">
+        <img src="img/eyes/4.webp" alt="eyes" id="eyes4">
+        <img src="img/eyes/5.webp" alt="eyes" id="eyes5">
+        <img src="img/eyes/6.webp" alt="eyes" id="eyes6">
+    </div>
+    <div id="hair">
+        <img src="img/hair/hair0.webp" alt="hair" id="hair0">
+        <img src="img/hair/hair1.webp" alt="hair" id="hair1">
+        <img src="img/hair/hair2.webp" alt="hair" id="hair2">
+    </div>
+    <img src="img/character-outline.webp" alt="outline" class="outline">
+    <div id="harness">
+        <img src="img/harness/harness-shadow.webp" alt="harness-shadow" class="harness-shadow">
+        <img src="img/harness/0.webp" alt="harness" id="harness0">
+        <img src="img/harness/1.webp" alt="harness" id="harness1">
+        <img src="img/harness/2.webp" alt="harness" id="harness2">
+        <img src="img/harness/3.webp" alt="harness" id="harness3">
+        <img src="img/harness/4.webp" alt="harness" id="harness4">
+        <img src="img/harness/5.webp" alt="harness" id="harness5">
+        <img src="img/harness/outline.webp" alt="harness-outline" class="harness-outline">
+    </div>
+    <div id="biribiri">
+        <img src="img/biribiri/0.webp" alt="biribiri" id="biribiri0">
+        <img src="img/biribiri/1.webp" alt="biribiri" id="biribiri1">
+    </div>
+    <div id="gun">
+        <img src="img/gun/0.webp" alt="gun" id="gun0">
+    </div>
+</div>
+<div class="description">
+    <p>
+        - 好きな配色でつかまったオリジナルけもりぅを作れます <br>
+        You can create your original captured lumaire with your favorite color scheme <br>
+        - URLをコピーして共有すると配色を共有できます <br>
+        You can share your color scheme by copying and sharing the URL <br>
+        - スクリーンショットを撮って保存してください <br>
+        Please take a screenshot and save it <br>
+        - 作成した画像はCC BY-SA 4.0でライセンスされます。つまり、luhrck.comへのリンクを貼れば自由に改変、再配布できます。 <br>
+        The created images are licensed under CC BY-SA 4.0. This means you can freely modify and redistribute them as long as you provide a link to luhrck.com. <br>
+    </p>
+</div>
