@@ -62,11 +62,11 @@ class HSBVControl {
     }
 
     randomize() {
-        const h = Math.floor(Math.random() * 360);
+        const h = Math.floor(Math.random() * this.hc.max);
         this.h = `hue-rotate(${h}deg)`;
-        const s = Math.floor(Math.random() * 100);
+        const s = Math.floor(Math.random() * this.sc.max);
         this.s = `saturate(${s}%)`;
-        const b = Math.floor(Math.random() * 100);
+        const b = Math.floor(Math.random() * this.bc.max);
         this.b = `brightness(${b}%)`;
         this.update();
         this.hc.value = h;
