@@ -108,6 +108,9 @@ class CanvasApp {
             } else {
                 this.randomize();
             }
+            setInterval(() => {
+                this.updateURL();
+            }, 1000);
         });
 
         this.eyesVisible = true;
@@ -117,10 +120,6 @@ class CanvasApp {
         this.gunVisible = false;
         this.droolingToggle = true;
         this.backgroundBlur = false;
-
-        setInterval(() => {
-            this.updateURL();
-        }, 1000);
 
         document.getElementById('randomize').addEventListener('click', () => {
             this.randomize();
