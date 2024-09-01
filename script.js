@@ -1,10 +1,9 @@
 class ImageLayer {
-    constructor(src, blendMode = 'source-over', isStatic = false) {
+    constructor(src, blendMode = 'source-over') {
         this.image = new Image();
         this.image.src = src;
         this.blendMode = blendMode;
         this.visible = true;
-        this.isStatic = isStatic;
     }
 
     applyFilter(filter) {
@@ -26,9 +25,9 @@ class HSBVControl {
     constructor(parent, hc, sc, bc, ...targets) {
         this.parent = parent;
         // defaults
-        this.h = `hue-rotate(0deg)`;
-        this.s = `saturate(100%)`;
-        this.b = `brightness(100%)`;
+        this.h = 0;
+        this.s = 100;
+        this.b = 100;
         this.targets = targets;
         this.hc = hc;
         this.sc = sc;
@@ -36,39 +35,60 @@ class HSBVControl {
 
         hc.value = 0;
         hc.addEventListener('input', (e) => {
-            this.h = `hue-rotate(${e.target.value}deg)`;
+            this.h = e.target.value;
             this.update();
+            this.parent.draw();
         });
 
         sc.value = 100;
         sc.addEventListener('input', (e) => {
-            this.s = `saturate(${e.target.value}%)`;
+            this.s = e.target.value;
             this.update();
+            this.parent.draw();
         });
 
         bc.value = 100;
         bc.addEventListener('input', (e) => {
-            this.b = `brightness(${e.target.value}%)`;
+            this.b = e.target.value;
             this.update();
+            this.parent.draw();
         });
+    }
+
+    serialize() {
+        return `${this.h}-${this.s}-${this.b}`;
     }
 
     update() {
         this.targets.forEach(target => {
-            target.applyFilter(`${this.h} ${this.s} ${this.b}`);
+            target.applyFilter(`hue-rotate(${this.h}deg) saturate(${this.s}%) brightness(${this.b}%)`);
         });
+    }
 
-        this.parent.draw()
+    deserialize(data) {
+        const d = data.split('-').map(Number);
+        this.h = d[0];
+        this.s = d[1];
+        this.b = d[2];
+        this.sync();
+        this.update();
+    }
+
+    sync() {
+        this.hc.value = this.h;
+        this.sc.value = this.s;
+        this.bc.value = this.b;
     }
 
     randomize() {
         const h = Math.floor(Math.random() * this.hc.max);
-        this.h = `hue-rotate(${h}deg)`;
+        this.h = h
         const s = Math.floor(Math.random() * this.sc.max);
-        this.s = `saturate(${s}%)`;
+        this.s = s
         const b = Math.floor(Math.random() * this.bc.max);
-        this.b = `brightness(${b}%)`;
+        this.b = b
         this.update();
+        this.parent.draw();
         this.hc.value = h;
         this.sc.value = s;
         this.bc.value = b;
@@ -82,7 +102,12 @@ class CanvasApp {
 
         this.initLayers();
         this.loadImages().then(() => {
-            this.randomize();
+            const data = this.readFromURL();
+            if (data) {
+                this.deserialize(data);
+            } else {
+                this.randomize();
+            }
         });
 
         this.eyesVisible = true;
@@ -90,6 +115,12 @@ class CanvasApp {
         this.harnessVisible = true;
         this.biribiriVisible = false;
         this.gunVisible = false;
+        this.droolingToggle = true;
+        this.backgroundBlur = false;
+
+        setInterval(() => {
+            this.updateURL();
+        }, 1000);
 
         document.getElementById('randomize').addEventListener('click', () => {
             this.randomize();
@@ -121,22 +152,30 @@ class CanvasApp {
         })
 
         document.getElementById('enable-biri').addEventListener('click', (e) => {
-            this.biribiriVisible = true;
-            this.gunVisible = false;
+            this.biribiriVisible = !this.biribiriVisible;
+            if (this.biribiriVisible) {
+                this.gunVisible = false;
+            }
             this.draw();
         })
 
         document.getElementById('enable-gun').addEventListener('click', (e) => {
-            this.gunVisible = true;
-            this.biribiriVisible = false;
+            this.gunVisible = !this.gunVisible;
+            if (this.gunVisible) {
+                this.biribiriVisible = false;
+            }
             this.draw();
         })
 
-        document.getElementById('none').addEventListener('click', (e) => {
-            this.biribiriVisible = false;
-            this.gunVisible = false;
+        document.getElementById('enable-drooling').addEventListener('click', (e) => {
+            this.droolingToggle = !this.droolingToggle;
             this.draw();
-        });
+        })
+
+        document.getElementById('background-blur').addEventListener('click', (e) => {
+            this.backgroundBlur = !this.backgroundBlur;
+            this.draw();
+        })
     }
 
     initLayers() {
@@ -202,8 +241,10 @@ class CanvasApp {
         )
 
         this.layers = {
-            background: new ImageLayer('img/background.webp', 'source-over', true),
-            characterBase: new ImageLayer('img/character-base.webp', 'source-over', true),
+            background: new ImageLayer('img/background.webp', 'source-over'),
+            backgroundBlur: new ImageLayer('img/background-blur.webp', 'source-over'),
+            chains: new ImageLayer('img/chains.webp', 'source-over'),
+            characterBase: new ImageLayer('img/character-base.webp', 'source-over'),
             sukumizu: [
                 sukumizuBase,
                 new ImageLayer('img/sukumizu/nakame.webp').applyFilter('opacity(0.1)'),
@@ -215,6 +256,14 @@ class CanvasApp {
             ],
             characterOutline: new ImageLayer('img/character-outline.webp', 'source-over'),
             eyes: eyes,
+            drooling0: [
+                new ImageLayer('img/drool/0/0.webp', 'multiply'),
+                new ImageLayer('img/drool/0/1.webp', 'source-over'),
+            ],
+            drooling1: [
+                new ImageLayer('img/drool/1/0.webp', 'multiply'),
+                new ImageLayer('img/drool/1/1.webp', 'source-over'),
+            ],
             hair: [
                 hair,
                 new ImageLayer('img/hair/hair1.webp', 'multiply'),
@@ -231,7 +280,7 @@ class CanvasApp {
                 new ImageLayer('img/harness/outline.webp', 'source-over')
             ],
             biribiri: [
-                new ImageLayer('img/biribiri/0.webp', ),
+                new ImageLayer('img/biribiri/0.webp'),
                 new ImageLayer('img/biribiri/1.webp', 'hard-light')
             ],
             gun: new ImageLayer('img/gun/0.webp', 'source-over'),
@@ -246,24 +295,20 @@ class CanvasApp {
             });
         };
 
-        const allLayers = [
-            this.layers.background,
-            this.layers.characterBase,
-            ...this.layers.sukumizu,
-            this.layers.characterOutline,
-            ...this.layers.harness,
-            ...this.layers.eyes,
-            ...this.layers.biribiri,
-            ...this.layers.hair,
-            this.layers.gun
-        ];
+        const allLayers = Object.values(this.layers).flat();
         await Promise.all(allLayers.map(layer => loadImage(layer)));
     }
 
     draw() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-        this.layers.background.draw(this.ctx);
+        if (this.backgroundBlur) {
+            this.layers.backgroundBlur.draw(this.ctx);
+        } else {
+            this.layers.background.draw(this.ctx);
+        }
+
+        this.layers.chains.draw(this.ctx);
         this.layers.characterBase.draw(this.ctx);
         this.layers.sukumizu.forEach(layer => layer.draw(this.ctx));
         this.layers.hair.forEach(layer => layer.draw(this.ctx));
@@ -279,6 +324,13 @@ class CanvasApp {
                 layer.draw(this.ctx)
             });
         }
+
+        if (this.droolingToggle) {
+            this.layers.drooling1.forEach(layer => layer.draw(this.ctx));
+        } else {
+            this.layers.drooling0.forEach(layer => layer.draw(this.ctx));
+        }
+
         if (this.biribiriVisible) {
             this.layers.biribiri.forEach(layer => layer.draw(this.ctx));
         }
@@ -294,6 +346,66 @@ class CanvasApp {
         this.harnessControl.randomize();
         this.harnessBeltControl.randomize();
         this.hairControl.randomize();
+    }
+
+    serialize() {
+        return {
+            sk: this.sukumizuControl.serialize(),
+            ey: this.eyesControl.serialize(),
+            hr: this.harnessControl.serialize(),
+            hb: this.harnessBeltControl.serialize(),
+            ha: this.hairControl.serialize(),
+            ev: this.eyesVisible ? 1 : 0,
+            tv: this.tearsVisible ? 1 : 0,
+            hv: this.harnessVisible ? 1 : 0,
+            bv: this.biribiriVisible ? 1 : 0,
+            gv: this.gunVisible ? 1 : 0,
+            dt: this.droolingToggle ? 1 : 0,
+            bb: this.backgroundBlur ? 1 : 0,
+        }
+    }
+
+    updateURL() {
+        const url = new URL(location.href);
+        const params = url.searchParams;
+        Object.entries(this.serialize()).forEach(([key, value]) => {
+            params.set(key, value);
+        });
+
+        history.replaceState(null, '', url.toString());
+    }
+
+    readFromURL() {
+        const url = new URL(location.href);
+        const params = url.searchParams;
+        const data = {};
+        for (const [key, value] of params) {
+            data[key] = value;
+        }
+
+        if (data.sk !== undefined) {
+            return data;
+        }
+
+        return null;
+    }
+
+    deserialize(data) {
+        this.sukumizuControl.deserialize(data.sk || '0-100-100');
+        this.eyesControl.deserialize(data.ey || '0-100-100');
+        this.harnessControl.deserialize(data.hr || '0-100-100');
+        this.harnessBeltControl.deserialize(data.hb || '0-100-100');
+        this.hairControl.deserialize(data.ha || '0-100-100');
+
+        this.eyesVisible = data.ev === '1';
+        this.tearsVisible = data.tv === '1';
+        this.harnessVisible = data.hv === '1';
+        this.biribiriVisible = data.bv === '1';
+        this.gunVisible = data.gv === '1';
+        this.droolingToggle = data.dt === '1';
+        this.backgroundBlur = data.bb === '1';
+
+        this.draw();
     }
 
     download() {
@@ -315,4 +427,17 @@ class CanvasApp {
     }
 }
 
+if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1) {
+    // https://bugs.webkit.org/show_bug.cgi?id=198416
+    alert("Safariでは上手く動かないかもしれません！Maybe not working well on Safari!");
+}
+
 const app = new CanvasApp();
+
+document.getElementById("share-x").addEventListener("click", function() {
+    window.open("https://x.com/intent/tweet?text=" + encodeURIComponent("Captured Lumaire Maker! - ") + "&url=" + encodeURIComponent(location.href));
+});
+
+document.getElementById("share-bsky").addEventListener("click", function() {
+    window.open("https://bsky.app/intent/compose?text=" + encodeURIComponent(`Captured Lumaire Maker! - ${window.location.href}`));
+});

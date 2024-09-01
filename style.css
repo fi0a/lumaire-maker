@@ -2,12 +2,12 @@ body {
     user-select: none;
     display: flex;
     flex-direction: column;
-    background-color: #030303;
+    background-color: #2e2e2e;
 }
 
 #controller {
     z-index: 1;
-    background-color: white;
+    background-color: #f3f3f3;
     border-radius: 3px;
     margin: 8px;
     height: auto;
@@ -21,6 +21,7 @@ body {
 
 #controller > div > button {
     margin: 3px;
+    background-color: #e6e6e6;
     border: none;
     border-radius: 3px;
     font-family: 'monospace';
@@ -28,17 +29,18 @@ body {
     cursor: pointer;
 }
 
-#canvas {
+#canvas-container {
     position: relative;
     margin: 8px;
     width: 900px;
     height: 1130px;
 }
 
-
 .description {
-    font-family: 'monospace';
-    color: white;
-    font-size: 16px;
+    z-index: 1;
+    background-color: #f3f3f3;
+    border-radius: 3px;
     margin: 8px;
+    height: auto;
+    width: 900px;
 }
